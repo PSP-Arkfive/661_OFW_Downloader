@@ -11,8 +11,8 @@ jobs:
     container:
       image: pspdev/pspdev
     steps:
-     - name: Dependencies
-       run: |
+      - name: Dependencies
+        run: |
           apk add clang build-base automake autoconf zlib-dev python3 py3-pycryptodomex py3-ecdsa zip curl unzip sudo
 
       - name: Cloning and Building lastest pspsdk
