@@ -2,23 +2,24 @@ TARGET = eboot
 
 OBJS = main.o
 
-#LIBS = -lpspnet_apctl -lpsphttp -lpspnet_resolver -lpspnet_inet -lpspnet -lpsputility -lpspsdk
+CFLAGS = -O0 -G0 -g -Wall -DDEBUG
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -nostartfiles
+ASFLAGS = $(CFLAGS)
+
 
 LIBS += \
-	-lpspgu \
-    -lpspnet \
-    -lpspnet_inet \
-    -lpspnet_apctl \
-    -lpspnet_resolver \
-    -lpsphttp \
-    -lpsputility \
-    -lpspnet_adhoc \
-    -lpspnet_adhocctl \
-    -lpspnet_adhocmatching \
+	-lpsphttp \
+	-lpspdownloader_debug \
 	-lpspkubridge
 
 
 PSP_EBOOT_TITLE = 661 OFW Downloader
+
+
+PSP_FW_VERSION=661
+
+
+BUILD_PRX = 1
 
 
 EXTRA_TARGETS = EBOOT.PBP
