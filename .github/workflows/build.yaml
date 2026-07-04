@@ -1,0 +1,74 @@
+name: "6.61 OFW Downloader"
+on:
+  push:
+    branches:
+      - main
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: pspdev/pspdev
+    steps:
+     - name: Dependencies
+        run: |
+          apk add clang build-base automake autoconf zlib-dev python3 py3-pycryptodomex py3-ecdsa zip curl unzip sudo
+
+      - name: Cloning and Building lastest pspsdk
+        run: | 
+          git clone https://github.com/pspdev/pspsdk
+
+      - name: Bootstrap sdk and build
+        working-directory: pspsdk
+        run: |
+          bash ./bootstrap
+          ./configure
+          make
+          make install
+      - name: Update psp-cfw-sdk
+        run: curl -OJL "https://github.com/pspdev/psp-cfw-sdk/releases/download/latest/psp-cfw-sdk.zip"
+      
+      - name: Extract psp-cfw-sdk
+        run: sudo unzip -o psp-cfw-sdk.zip -d /
+
+
+
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Build
+        run:  make clean && make 
+
+      - name: Compress
+        run: |
+          mkdir -p PSP/GAME/661OFWDownloader
+          mv EBOOT.PBP PSP/GAME/661OFWDownloader/
+          zip -r 661OFWDownloader.zip PSP
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: "661OFWDownloader-release"
+          path: "661OFWDownloader.zip"
+   release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          name: "661OFWDownloader-release"
+          path: .
+      - name:
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: "661OFWDownloader"
+          prerelease: false
+          make_latest: true
+          files: "661OFWDownloader.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
